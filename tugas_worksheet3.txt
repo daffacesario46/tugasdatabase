@@ -1,0 +1,300 @@
+
+
+
+==================================== TUGAS WORKSHEET 3 ================================================================
+
+SOAL 3.2
+
+1. berapa jumlah pelanggan yang tahun lahirnya 1998
+
+MariaDB [dbpos_sib6]> select * from pelanggan where year(tgl_lahir)=1998;
+Empty set (0.013 sec)
+
+2. berapa jumlah pelanggan perempuan yang lahirnya di Jakarta
+
+MariaDB [dbpos_sib6]> select * from pelanggan where jk = 'P' && tmp_lahir = 'Jakarta';
++----+-------+-------------+----+-----------+------------+------------------+----------+
+| id | kode  | nama        | jk | tmp_lahir | tgl_lahir  | email            | kartu_id |
++----+-------+-------------+----+-----------+------------+------------------+----------+
+|  6 | C006  | Gayatri Dwi | P  | Jakarta   | 1987-11-28 | gaya87@gmail.com |        1 |
+|  7 | C007  | Dewi Gyat   | P  | Jakarta   | 1988-12-01 | giyat@gmail.com  |        1 |
+| 12 | K0011 | Ira         | P  | Jakarta   | 2023-11-07 | ira@gmail.com    |        4 |
++----+-------+-------------+----+-----------+------------+------------------+----------+
+3 rows in set (0.008 sec)
+
+3. berapa jumlah stok semua produk yang harga jualnya dibawah 10rb
+
+MariaDB [dbpos_sib6]> select count(*) as jumlah_stok from produk where harga_jual < 10000;
++-------------+
+| jumlah_stok |
++-------------+
+|           4 |
++-------------+
+1 row in set (0.003 sec)
+
+4. Ada berapa produk yang mempunyai kode awal K
+
+MariaDB [dbpos_sib6]> select count(*) as jumlah_produk from produk where kode like 'K%';
++---------------+
+| jumlah_produk |
++---------------+
+|             1 |
++---------------+
+1 row in set (0.012 sec)
+
+5. berapa harga jual rata rata produk yang diatas 1jt
+
+MariaDB [dbpos_sib6]> select avg(harga_jual) as harga_rata2 from produk where harga_jual > 1000000;
++--------------------+
+| harga_rata2        |
++--------------------+
+| 31387733.333333332 |
++--------------------+
+1 row in set (0.001 sec)
+
+6. Tampilkan jumlah stok yang paling besar
+
+MariaDB [dbpos_sib6]> select * from produk order by stok desc limit 1;
++----+------+-----------+------------+------------+------+----------+------------+-----------+-----------------+
+| id | kode | nama      | harga_beli | harga_jual | stok | min_stok | foto       | deskripsi | jenis_produk_id |
++----+------+-----------+------------+------------+------+----------+------------+-----------+-----------------+
+|  7 | TB01 | Teh Botol |       2000 |       2500 |   53 |       10 | foto-7.jpg | NULL      |               4 |
++----+------+-----------+------------+------------+------+----------+------------+-----------+-----------------+
+1 row in set (0.002 sec)
+
+7. ada berapa produk yang stoknya kurang dari minimal stok
+
+MariaDB [dbpos_sib6]> select * from produk where stok = (select min(stok) from produk);
++----+------+------------------+------------+------------+------+----------+------+-----------+-----------------+
+| id | kode | nama             | harga_beli | harga_jual | stok | min_stok | foto | deskripsi | jenis_produk_id |
++----+------+------------------+------------+------------+------+----------+------+-----------+-----------------+
+|  2 | TV02 | Televisi 40 inch |    5500000 |    7440000 |    4 |        2 | NULL | NULL      |               1 |
+|  4 | M001 | Meja Makan       |     500000 |     600000 |    4 |        3 | NULL | NULL      |               2 |
++----+------+------------------+------------+------------+------+----------+------+-----------+-----------------+
+2 rows in set (0.012 sec)
+
+8. berapa total asset dari keseluruhan produk
+
+MariaDB [dbpos_sib6]> select sum(harga_beli * stok) as total_asset from produk;
++-------------+
+| total_asset |
++-------------+
+|   480504000 |
++-------------+
+1 row in set (0.001 sec)
+
+
+SOAL 3.3 
+
+1. tampilkan data : id, nama, stok dan informasi jika stok telah sampai batas minimal atau kurang dari 
+minimum stok dengan informasi 'segera belanja' jika tidak 'stok aman'
+
+MariaDB [dbpos_sib6]> select id, nama, stok, min_stok, case
+    -> when stok >= min_stok then 'stok aman'
+    -> else 'silahkan belanja'
+    -> end as keterangan from produk;
++----+-------------------+------+----------+------------------+
+| id | nama              | stok | min_stok | keterangan       |
++----+-------------------+------+----------+------------------+
+|  1 | Televisi 21 inchs |    5 |        2 | stok aman        |
+|  2 | Televisi 40 inch  |    4 |        2 | stok aman        |
+|  3 | Kulkas 2 pintu    |    6 |        2 | stok aman        |
+|  4 | Meja Makan        |    4 |        3 | stok aman        |
+|  5 | Teh Kotak         |    6 |       10 | silahkan belanja |
+|  6 | PC Desktop HP     |    9 |        2 | stok aman        |
+|  7 | Teh Botol         |   53 |       10 | stok aman        |
+|  8 | Notebook Acer S   |    7 |        2 | stok aman        |
+|  9 | Notebook Lenovo   |    9 |        2 | stok aman        |
+| 11 | Laptop Lenovo     |    5 |        2 | stok aman        |
+| 15 | Kopi              |   10 |       15 | silahkan belanja |
+| 16 | Teh Sosro 2       |   10 |       12 | silahkan belanja |
+| 18 | Laptop Asus       |   10 |       20 | silahkan belanja |
+| 19 | Televisi 22 inc`  |    5 |        2 | stok aman        |
+| 20 | Televisi 23 inc   |    5 |        2 | stok aman        |
+| 21 | Televisi 24 inc   |    5 |        2 | stok aman        |
+| 22 | Televisi 25 inc   |    5 |        2 | stok aman        |
+| 24 | Televisi 27 inc   |    5 |        2 | stok aman        |
+| 25 | Televisi 28 inc   |    5 |        2 | stok aman        |
+| 26 | Televisi 29 inc   |    5 |        2 | stok aman        |
+| 27 | Teh Pucuk         |   10 |        2 | stok aman        |
+| 28 | Teh Pucuk2        |   10 |        2 | stok aman        |
++----+-------------------+------+----------+------------------+
+22 rows in set (0.001 sec)
+
+2. tampilkan data pelanggan : id, nama, umur, dan kategori umur : jika umur < 17 'muda',
+17 - 55 'dewasa', slain itu 'Tua'
+
+MariaDB [dbpos_sib6]> select id, nama,
+    -> timestampdiff(year, tgl_lahir, curdate()) as umur, case
+    -> when timestampdiff(year, tgl_lahir, curdate()) < 17 then 'Muda'
+    -> when timestampdiff(year, tgl_lahir, curdate()) between 17 and 55 then 'Dewasa'
+    -> else 'Tua' end as kategori_umur from pelanggan;
++----+--------------------+------+---------------+
+| id | nama               | umur | kategori_umur |
++----+--------------------+------+---------------+
+|  1 | Agung Sedayu Group |   14 | Muda          |
+|  2 | Pandan Wangi       |   74 | Tua           |
+|  3 | Sekar Mirah        |   41 | Dewasa        |
+|  4 | Swandaru Geni      |   43 | Dewasa        |
+|  5 | Pradabashu         |   39 | Dewasa        |
+|  6 | Gayatri Dwi        |   36 | Dewasa        |
+|  7 | Dewi Gyat          |   35 | Dewasa        |
+|  8 | Andre Haru         |   33 | Dewasa        |
+|  9 | Ahmad Hasan        |   31 | Dewasa        |
+| 10 | Cassanndra         |   33 | Dewasa        |
+| 11 | Andi Wijaya        |    0 | Muda          |
+| 12 | Ira                |    0 | Muda          |
++----+--------------------+------+---------------+
+12 rows in set (0.008 sec)
+
+3. tampilkan id, kode, nama dan bonus untuk kode 'TV01' -> 'DVD player' , 'K001' -> 'Rice cooker'
+selain itu tidak ada.
+
+MariaDB [dbpos_sib6]> select id, kode, nama, case
+    -> when kode = 'TV01' then 'DVD player'
+    -> when kode = 'K001' then 'Rice cooker'
+    -> else 'tidak ada' end as bonus from produk;
++----+--------+-------------------+-------------+
+| id | kode   | nama              | bonus       |
++----+--------+-------------------+-------------+
+|  1 | TV01   | Televisi 21 inchs | DVD player  |
+|  2 | TV02   | Televisi 40 inch  | tidak ada   |
+|  3 | K001   | Kulkas 2 pintu    | Rice cooker |
+|  4 | M001   | Meja Makan        | tidak ada   |
+|  5 | TK01   | Teh Kotak         | tidak ada   |
+|  6 | PC01   | PC Desktop HP     | tidak ada   |
+|  7 | TB01   | Teh Botol         | tidak ada   |
+|  8 | AC01   | Notebook Acer S   | tidak ada   |
+|  9 | LN01   | Notebook Lenovo   | tidak ada   |
+| 11 | L005   | Laptop Lenovo     | tidak ada   |
+| 15 | L112   | Kopi              | tidak ada   |
+| 16 | L113   | Teh Sosro 2       | tidak ada   |
+| 18 | L0015  | Laptop Asus       | tidak ada   |
+| 19 | TV0115 | Televisi 22 inc`  | tidak ada   |
+| 20 | TV0116 | Televisi 23 inc   | tidak ada   |
+| 21 | TV0117 | Televisi 24 inc   | tidak ada   |
+| 22 | TV0118 | Televisi 25 inc   | tidak ada   |
+| 24 | TV0120 | Televisi 27 inc   | tidak ada   |
+| 25 | TV0121 | Televisi 28 inc   | tidak ada   |
+| 26 | TV0122 | Televisi 29 inc   | tidak ada   |
+| 27 | THP001 | Teh Pucuk         | tidak ada   |
+| 28 | THP002 | Teh Pucuk2        | tidak ada   |
++----+--------+-------------------+-------------+
+22 rows in set (0.008 sec)
+
+
+SOAL 3.4
+
+1. tampilkan data stastistik jumlah tempat lahir pelanggan
+
+MariaDB [dbpos_sib6]> select count(tmp_lahir) as jumlah_tmp_lahir from pelanggan;
++------------------+
+| jumlah_tmp_lahir |
++------------------+
+|               12 |
++------------------+
+1 row in set (0.001 sec)
+
+2. tampilkan jumlah stastistik produk berdasarkan jenis produk
+
+MariaDB [dbpos_sib6]> select jenis_produk_id, sum(id) as jumlah_produk from produk group by jenis_produk_id;
++-----------------+---------------+
+| jenis_produk_id | jumlah_produk |
++-----------------+---------------+
+|               1 |           208 |
+|               2 |             4 |
+|               4 |            82 |
+|               5 |            23 |
++-----------------+---------------+
+4 rows in set (0.001 sec)
+
+3. tampilkan data pelanggan yang usianya dibawah rata usia pelanggan
+
+MariaDB [dbpos_sib6]> select * from pelanggan where year(curdate()) - year(tgl_lahir)
+    -> < (select avg(year(curdate()) - year(tgl_lahir)) as usia_rata2 from pelanggan);
++----+-------+--------------------+----+-----------+------------+------------------+----------+
+| id | kode  | nama               | jk | tmp_lahir | tgl_lahir  | email            | kartu_id |
++----+-------+--------------------+----+-----------+------------+------------------+----------+
+|  1 | C001  | Agung Sedayu Group | L  | Solo      | 2010-01-01 | sedayu@gmail.com |        1 |
+|  9 | C009  | Ahmad Hasan        | L  | Surabaya  | 1992-10-15 | ahasan@gmail.com |        4 |
+| 11 | K0010 | Andi Wijaya        | L  | Tangerang | 2023-11-07 | andi@gmail.com   |        2 |
+| 12 | K0011 | Ira                | P  | Jakarta   | 2023-11-07 | ira@gmail.com    |        4 |
++----+-------+--------------------+----+-----------+------------+------------------+----------+
+4 rows in set (0.013 sec)
+
+4. tampilkan data produk yang harganya diatas rata rata harga produk;
+MariaDB [dbpos_sib6]> SELECT * FROM produk WHERE harga_beli > (SELECT AVG(harga_beli) FROM produk);
++----+------+------------------+------------+------------+------+----------+------+-----------+-----------------+
+| id | kode | nama             | harga_beli | harga_jual | stok | min_stok | foto | deskripsi | jenis_produk_id |
++----+------+------------------+------------+------------+------+----------+------+-----------+-----------------+
+|  2 | TV02 | Televisi 40 inch |    5500000 |    7440000 |    4 |        2 | NULL | NULL      |               1 |
+|  6 | PC01 | PC Desktop HP    |    7000000 |    9984000 |    9 |        2 | NULL | NULL      |               5 |
+|  8 | AC01 | Notebook Acer S  |    8000000 |   11232000 |    7 |        2 | NULL | NULL      |               5 |
+|  9 | LN01 | Notebook Lenovo  |    9000000 |   12480000 |    9 |        2 | NULL | NULL      |               5 |
+| 11 | L005 | Laptop Lenovo    |   13000000 |   16000000 |    5 |        2 |      | NULL      |               1 |
++----+------+------------------+------------+------------+------+----------+------+-----------+-----------------+
+5 rows in set (0.001 sec)
+
+5. tampilkan data pelanggan yang memiliki kartu dimana iuran tahunan kartu diatas 90rb
+
+MariaDB [dbpos_sib6]> select *, case
+    -> when jk = 'L' THEN 100000
+    -> when jk = 'P' then 95000
+    -> else 'tidak ada'
+    -> end as kartu_iuran from pelanggan;
++----+-------+--------------------+----+------------+------------+----------------------+----------+-------------+
+| id | kode  | nama               | jk | tmp_lahir  | tgl_lahir  | email                | kartu_id | kartu_iuran |
++----+-------+--------------------+----+------------+------------+----------------------+----------+-------------+
+|  1 | C001  | Agung Sedayu Group | L  | Solo       | 2010-01-01 | sedayu@gmail.com     |        1 | 100000      |
+|  2 | C002  | Pandan Wangi       | P  | Yogyakarta | 1950-01-01 | wangi@gmail.com      |        2 | 95000       |
+|  3 | C003  | Sekar Mirah        | P  | Kediri     | 1983-02-20 | mirah@yahoo.com      |        1 | 95000       |
+|  4 | C004  | Swandaru Geni      | L  | Kediri     | 1981-01-04 | swandaru@yahoo.com   |        4 | 100000      |
+|  5 | C005  | Pradabashu         | L  | Pati       | 1985-04-02 | prada85@gmail.com    |        2 | 100000      |
+|  6 | C006  | Gayatri Dwi        | P  | Jakarta    | 1987-11-28 | gaya87@gmail.com     |        1 | 95000       |
+|  7 | C007  | Dewi Gyat          | P  | Jakarta    | 1988-12-01 | giyat@gmail.com      |        1 | 95000       |
+|  8 | C008  | Andre Haru         | L  | Surabaya   | 1990-07-15 | andre.haru@gmail.com |        4 | 100000      |
+|  9 | C009  | Ahmad Hasan        | L  | Surabaya   | 1992-10-15 | ahasan@gmail.com     |        4 | 100000      |
+| 10 | C010  | Cassanndra         | P  | Belfast    | 1990-11-20 | casa90@gmail.com     |        1 | 95000       |
+| 11 | K0010 | Andi Wijaya        | L  | Tangerang  | 2023-11-07 | andi@gmail.com       |        2 | 100000      |
+| 12 | K0011 | Ira                | P  | Jakarta    | 2023-11-07 | ira@gmail.com        |        4 | 95000       |
++----+-------+--------------------+----+------------+------------+----------------------+----------+-------------+
+12 rows in set (0.001 sec)
+
+6. tampilkan stastistik data produk dimana harga produknya dibawah rata rata harga produk secara keseluruhan
+
+MariaDB [dbpos_sib6]> select harga_beli, harga_jual from produk where harga_jual < (select avg(harga_jual) from produk) limit 5;
++------------+------------+
+| harga_beli | harga_jual |
++------------+------------+
+|    5500000 |    7440000 |
+|    3500000 |    4680000 |
+|     500000 |     600000 |
+|       3000 |       3500 |
+|    7000000 |    9984000 |
++------------+------------+
+5 rows in set (0.002 sec)
+
+7. tampilkan data pelanggan yang memiliki kartu dimana diskon kartu yang diberikan diatas 3%
+
+MariaDB [dbpos_sib6]> select *, case
+    -> when id <= 5 then 'Diskon 5%'
+    -> when id >= 6 then 'Diskon 10%'
+    -> else 'tidak ada'
+    -> end as kartu_diskon from pelanggan;
++----+-------+--------------------+----+------------+------------+----------------------+----------+--------------+
+| id | kode  | nama               | jk | tmp_lahir  | tgl_lahir  | email                | kartu_id | kartu_diskon |
++----+-------+--------------------+----+------------+------------+----------------------+----------+--------------+
+|  1 | C001  | Agung Sedayu Group | L  | Solo       | 2010-01-01 | sedayu@gmail.com     |        1 | Diskon 5%    |
+|  2 | C002  | Pandan Wangi       | P  | Yogyakarta | 1950-01-01 | wangi@gmail.com      |        2 | Diskon 5%    |
+|  3 | C003  | Sekar Mirah        | P  | Kediri     | 1983-02-20 | mirah@yahoo.com      |        1 | Diskon 5%    |
+|  4 | C004  | Swandaru Geni      | L  | Kediri     | 1981-01-04 | swandaru@yahoo.com   |        4 | Diskon 5%    |
+|  5 | C005  | Pradabashu         | L  | Pati       | 1985-04-02 | prada85@gmail.com    |        2 | Diskon 5%    |
+|  6 | C006  | Gayatri Dwi        | P  | Jakarta    | 1987-11-28 | gaya87@gmail.com     |        1 | Diskon 10%   |
+|  7 | C007  | Dewi Gyat          | P  | Jakarta    | 1988-12-01 | giyat@gmail.com      |        1 | Diskon 10%   |
+|  8 | C008  | Andre Haru         | L  | Surabaya   | 1990-07-15 | andre.haru@gmail.com |        4 | Diskon 10%   |
+|  9 | C009  | Ahmad Hasan        | L  | Surabaya   | 1992-10-15 | ahasan@gmail.com     |        4 | Diskon 10%   |
+| 10 | C010  | Cassanndra         | P  | Belfast    | 1990-11-20 | casa90@gmail.com     |        1 | Diskon 10%   |
+| 11 | K0010 | Andi Wijaya        | L  | Tangerang  | 2023-11-07 | andi@gmail.com       |        2 | Diskon 10%   |
+| 12 | K0011 | Ira                | P  | Jakarta    | 2023-11-07 | ira@gmail.com        |        4 | Diskon 10%   |
++----+-------+--------------------+----+------------+------------+----------------------+----------+--------------+
+12 rows in set (0.002 sec)
